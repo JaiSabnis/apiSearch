@@ -18,7 +18,7 @@ import { Ionicons } from "@expo/vector-icons";
 const width = Dimensions.get("window").width;
 const height = Dimensions.get("window").height;
 
-export default class GameSearch extends React.Component {
+export default class SongSearch extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -40,12 +40,26 @@ export default class GameSearch extends React.Component {
       .catch((error) => console.log(error));
   };
 
-  searchGame = (song) => {
-    var url = "https://api.rawg.io/api/games?search=" + song;
+  search = (query, mediaType, entity) => {
+    /*
+    MEDIATYPES: 
+    "movie", "movie"
+    "music", "song"
+    "podcast", "podcast"
+    "ebook", "ebook"
+    "tvShow", "tvSeason"
+    */
+
+    var url =
+      "https://itunes.apple.com/search?term=" +
+      query +
+      "&media=" +
+      mediaType +
+      "&entity=" +
+      entity +
+      "&limit=20";
     this.getData(url);
   };
-
-  keyExtractor = (dataSource) => dataSource.id;
 
   render() {
     if (this.state.isLoading) {
@@ -74,43 +88,27 @@ export default class GameSearch extends React.Component {
             <TextInput
               placeholder="Search"
               onChangeText={(text) => {
-                this.searchGame(text);
+                this.search(text, "music", "song");
               }}
             />
           </Item>
 
           <FlatList
             data={this.state.dataSource}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item) => item.trackId}
             renderItem={({ item }) => (
               <Card style={styles.listCard}>
-                {item.background_image === null ? (
-                  <Image
-                    resizeMode="contain"
-                    style={{
-                      width: 100,
-                      height: 100,
-                      borderRadius: 10,
-                      marginTop: 10,
-                      marginLeft: 10,
-                      marginBottom: 10,
-                    }}
-                    source={require("./assets/person.png")}
-                  />
-                ) : (
-                  <Image
-                    resizeMode="contain"
-                    style={{
-                      width: 100,
-                      height: 100,
-                      borderRadius: 10,
-                      marginTop: 10,
-                      marginLeft: 10,
-                      marginBottom: 10,
-                    }}
-                    source={{ uri: item.background_image }}
-                  />
-                )}
+                <Image
+                  style={{
+                    width: 100,
+                    height: 100,
+                    borderRadius: 10,
+                    marginTop: 10,
+                    marginLeft: 10,
+                    marginBottom: 10,
+                  }}
+                  source={{ uri: item.artworkUrl100 }}
+                />
                 <View
                   style={{
                     marginLeft: 10,
@@ -119,15 +117,13 @@ export default class GameSearch extends React.Component {
                   }}
                 >
                   <Text
-                    style={{
-                      fontSize: 25,
-                      fontWeight: "bold",
-                      color: "#EAF0F1",
-                    }}
+                    style={{ fontSize: 25, fontWeight: "800", color: "white" }}
                   >
-                    {item.name}
+                    {item.trackName}
                   </Text>
-                  <Text style={{ fontSize: 13, color: "white" }}></Text>
+                  <Text style={{ fontSize: 13, color: "white" }}>
+                    {item.artistName}
+                  </Text>
                 </View>
               </Card>
             )}

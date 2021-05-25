@@ -18,7 +18,7 @@ import { Ionicons } from "@expo/vector-icons";
 const width = Dimensions.get("window").width;
 const height = Dimensions.get("window").height;
 
-export default class GameSearch extends React.Component {
+export default class TeamSearch extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -34,18 +34,26 @@ export default class GameSearch extends React.Component {
       .then((responseJson) => {
         this.setState({
           isLoading: false,
-          dataSource: responseJson.results,
+          dataSource: responseJson.teams,
         });
       })
       .catch((error) => console.log(error));
   };
 
-  searchGame = (song) => {
-    var url = "https://api.rawg.io/api/games?search=" + song;
+  search = (query) => {
+    /*
+    MEDIATYPES: 
+    "movie", "movie"
+    "music", "song"
+    "podcast", "podcast"
+    "ebook", "ebook"
+    "tvShow", "tvSeason"
+    */
+
+    var url =
+      "https://www.thesportsdb.com/api/v1/json/1/searchteams.php?t=" + query;
     this.getData(url);
   };
-
-  keyExtractor = (dataSource) => dataSource.id;
 
   render() {
     if (this.state.isLoading) {
@@ -74,17 +82,17 @@ export default class GameSearch extends React.Component {
             <TextInput
               placeholder="Search"
               onChangeText={(text) => {
-                this.searchGame(text);
+                this.search(text);
               }}
             />
           </Item>
 
           <FlatList
             data={this.state.dataSource}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item) => item.idTeam}
             renderItem={({ item }) => (
               <Card style={styles.listCard}>
-                {item.background_image === null ? (
+                {item.strTeamLogo === null ? (
                   <Image
                     resizeMode="contain"
                     style={{
@@ -108,7 +116,7 @@ export default class GameSearch extends React.Component {
                       marginLeft: 10,
                       marginBottom: 10,
                     }}
-                    source={{ uri: item.background_image }}
+                    source={{ uri: item.strTeamLogo }}
                   />
                 )}
                 <View
@@ -119,15 +127,13 @@ export default class GameSearch extends React.Component {
                   }}
                 >
                   <Text
-                    style={{
-                      fontSize: 25,
-                      fontWeight: "bold",
-                      color: "#EAF0F1",
-                    }}
+                    style={{ fontSize: 25, fontWeight: "800", color: "white" }}
                   >
-                    {item.name}
+                    {item.strTeam}
                   </Text>
-                  <Text style={{ fontSize: 13, color: "white" }}></Text>
+                  <Text style={{ fontSize: 13, color: "white" }}>
+                    {item.artistName}
+                  </Text>
                 </View>
               </Card>
             )}
